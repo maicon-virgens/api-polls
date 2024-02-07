@@ -1,6 +1,6 @@
 # API POLLS (Node.js)
 
-A real-time voting system where users can create a poll and other users can cast their votes. The system generates a ranking among the options and updates the votes in real-time.
+A system for real-time voting, enabling users to create polls and others to cast their votes. The system automatically generates rankings for the options and updates the votes instantaneously.
 
 ## Requisites
 
