@@ -6,6 +6,7 @@ const app = fastify();
 
 app.register(createPoll);
 
+
 app.register(getPoll);
 
 app.listen({port: 3333}).then(()=>{
