@@ -13,7 +13,8 @@ export async function getPoll(app: FastifyInstance) {
         });
     
         const { pollId } = getPollParams.parse(request.params);
-    
+
+        //trazer enquete e as opções da enquete
         const poll = await prisma.poll.findUnique({
             where: {
                 id: pollId,
