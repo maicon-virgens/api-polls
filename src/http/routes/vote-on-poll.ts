@@ -1,7 +1,9 @@
-import z from "zod";
+import z, { number } from "zod";
 import { randomUUID } from "crypto";
 import {prisma} from "./../lib/prisma";
 import { FastifyInstance } from "fastify";
+import {redis} from "./../lib/redis";
+import { voting } from "../utils/voting-pub-sub";
 
 //criar  voto na enquete
 export async function voteOnPoll(app: FastifyInstance) {
@@ -39,7 +41,16 @@ export async function voteOnPoll(app: FastifyInstance) {
                     where:{
                         id: userPreviousVotePoll.id,
                     }
-                })
+                });
+                //atualizando soma de votos no redis de uma enquete
+                const votes = await redis.zincrby(pollId, -1, userPreviousVotePoll.pollOptionId);
+
+                voting.publish(pollId, {
+                    pollOptionId: userPreviousVotePoll.pollOptionId,
+                    votes: Number(votes),
+                });
+
+
 
 
             }else if(userPreviousVotePoll){
@@ -66,7 +77,16 @@ export async function voteOnPoll(app: FastifyInstance) {
                 pollOptionId,
             }
         });
-    
+
+        //contar os votos 
+        //cada enquete vai ter seu proprio rank
+        const votes = await redis.zincrby(pollId, 1, pollOptionId);
+
+        voting.publish(pollId, {
+            pollOptionId,
+            votes: Number(votes),
+        });
+
         return reply.status(201).send();
     });
     
